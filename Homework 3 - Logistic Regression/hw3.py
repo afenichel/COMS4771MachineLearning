@@ -21,7 +21,6 @@ def bag_of_words(m=100):
 	indices = np.random.permutation(n)
 	training_idx, test_idx = indices[:m], indices[m:]
 
-
 	test_x=np.hstack([np.asarray(os.listdir(folders[ham]))[test_idx],np.asarray(os.listdir(folders[spam]))[test_idx]])
 	test_y=np.hstack([np.ones(len(test_idx)), np.ones(len(test_idx))])
 
@@ -46,8 +45,8 @@ def bag_of_words(m=100):
 	distinct_dict=np.unique(dictionary)
 	word_bag=np.matlib.repmat(np.zeros(len(distinct_dict)),len(x),1)
 
-	for i in x_array:
-		idx=x.index(i)
+	for j in x_array:
+		idx=x.index(j)
 		for i in counter[idx]:
 			word_bag[idx][np.where(distinct_dict==i[0])]=i[1]
 
@@ -60,24 +59,14 @@ def classify_new_email(i,m):
 	folders=np.array([os.path.join(os.getcwd(),'enron1\\ham'), os.path.join(os.getcwd(),'enron1\\spam')])
 	ham=0
 	spam=1
-
 	x=[]
 	counter={}
+	with open(i) as f:
+		word_list=[stemming.porter.stem(word.lower()) for word in re.sub("[^a-zA-Z]"," ", f.read()).split()]
+		counter[np.where(i==i)[0][0]]=scipy.stats.itemfreq(word_list)	
 
-	if i.find('ham.txt')>0:
-		test_y=ham
-		with open(os.path.join(folders[ham], i)) as f:
-			word_list=[stemming.porter.stem(word.lower()) for word in re.sub("[^a-zA-Z]"," ", f.read()).split()]
-			counter[np.where(i==i)[0][0]]=scipy.stats.itemfreq(word_list)	
-	elif i.find('spam.txt')>0:
-		test_y=spam
-		with open(os.path.join(folders[spam], i)) as f:
-			word_list=[stemming.porter.stem(word.lower()) for word in re.sub("[^a-zA-Z]"," ", f.read()).split()]
-			counter[np.where(i==i)[0][0]]=scipy.stats.itemfreq(word_list)	
-	
 	x_array=np.array(word_list)		
 	word_bag=np.matlib.repmat(np.zeros(len(distinct_dict)),1,1)
-
 
 	for j in x_array:
 		c=np.where(counter[0][:,0]==j)[0][0]
